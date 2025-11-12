@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Babylon.js Block Follower</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <style>
+        /* Styles needed to make the canvas fill the screen */
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #111827; 
+        }
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+    </style>
+    <script>
+        // --- Global Variables ---
+        const blockSpeed = 0.5; // Constant forward movement speed (negative Z axis)
+        let block; // The object being controlled (box or car)
+        const rotationSpeed = 0.05; 
+        const keyStates = {}; 
+		 const lateralSpeed = 0.1; // left/right movement speed
+        let followCamera; // Reference to the FollowCamera
+
+        const createScene = (canvas, engine) => {
+            const scene = new BABYLON.Scene(engine);
+            scene.clearColor = new BABYLON.Color3(0.1, 0.1, 0.2); // Dark scene background
+            
+            // Lighting
+            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.7;
+
+            // --- 1. GUARANTEED DEFAULT CAMERA ---
+            // This prevents the "No camera defined" error upon engine start.
+            const tempCamera = new BABYLON.UniversalCamera("tempCamera", new BABYLON.Vector3(0, 10, -20), scene);
+            tempCamera.setTarget(BABYLON.Vector3.Zero());
+            scene.activeCamera = tempCamera;
+
+
+            // Ground
+            const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 1000, height: 1000 }, scene);
+            const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
+            const textureURL = "https://placehold.co/128x128/333/eee?text=Tile";
+            const groundTexture = new BABYLON.Texture(textureURL, scene);
+            groundTexture.uScale = 100;
+            groundTexture.vScale = 100;
+            groundMat.diffuseTexture = groundTexture;
+            groundMat.specularColor = new BABYLON.Color3(0, 0, 0);
+            ground.material = groundMat;
+
+            // --- 2. TEMPORARY PLACEHOLDER BLOCK ---
+            const tempBlock = BABYLON.MeshBuilder.CreateBox("tempBlock", { size: 1 }, scene);
+            const tempMat = new BABYLON.StandardMaterial("tempMat", scene);
+            tempMat.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2); // Red color
+            tempBlock.material = tempMat;
+            tempBlock.position.set(0, 0.5, 50); // Start position
+            
+            // Assign the temporary block as the moving object initially
+            block = tempBlock;
+            
+            // --- 3. FOLLOW CAMERA SETUP (Created and made active) ---
+            followCamera = new BABYLON.FollowCamera("FollowCam", block.position, scene);
+            followCamera.lockedTarget = block;
+            followCamera.radius = 10;
+            followCamera.heightOffset = 2;
+            followCamera.rotationOffset = 180;
+            followCamera.cameraAcceleration = 0.05;
+            followCamera.maxCameraSpeed = 50;
+            
+            // Switch to the FollowCamera and dispose of the temp camera
+            scene.activeCamera = followCamera; 
+            tempCamera.dispose(); 
+
+
+            // --- 4. GLB ASYNCHRONOUS LOAD ATTEMPT ---
+            BABYLON.SceneLoader.ImportMesh("", "./models/", "carbrown.glb", scene, (meshes) => {
+                
+                // --- SUCCESS: Replace placeholder with car ---
+                
+                tempBlock.dispose(); 
+                block = meshes[0]; 
+                followCamera.lockedTarget = block; 
+
+                block.position.set(0, 0.5, 50); 
+                block.scaling = new BABYLON.Vector3(0.6, 0.6, 0.6);
+                //block.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL); // Face "forward"
+                
+                console.log("SUCCESS: GLB Model loaded and placeholder replaced.");
+            }, 
+            // Progress Callback (null)
+            null, 
+            // Error Callback (Crucial)
+            (scene, message, exception) => {
+                console.error("FAILED TO LOAD GLB MODEL:", message);
+                alert("GLB LOAD FAILED! Check your browser console (F12) for a 404 error. The red box is running instead.");
+            });
+
+
+            // --- 5. INPUT AND MOVEMENT LOGIC ---
+            window.addEventListener("keydown", (e) => {
+                if (e.code === "KeyA") keyStates.left = true;
+                if (e.code === "KeyD") keyStates.right = true;
+            });
+
+            window.addEventListener("keyup", (e) => {
+                if (e.code === "KeyA") keyStates.left = false;
+                if (e.code === "KeyD") keyStates.right = false;
+            });
+			 // --- TOUCH INPUT (for mobile) ---
+      let activeTouch = null;
+
+      window.addEventListener("touchstart", (e) => {
+        if (e.touches.length > 0) {
+          activeTouch = e.touches[0];
+          const touchX = activeTouch.clientX;
+          const screenWidth = window.innerWidth;
+
+          if (touchX < screenWidth / 2) {
+            keyStates.left = true;
+            keyStates.right = false;
+          } else {
+            keyStates.right = true;
+            keyStates.left = false;
+          }
+        }
+      });
+
+      window.addEventListener("touchmove", (e) => {
+        if (e.touches.length > 0) {
+          const touchX = e.touches[0].clientX;
+          const screenWidth = window.innerWidth;
+
+          keyStates.left = touchX < screenWidth / 2;
+          keyStates.right = touchX > screenWidth / 2;
+        }
+      });
+
+      window.addEventListener("touchend", () => {
+        keyStates.left = false;
+        keyStates.right = false;
+        activeTouch = null;
+      });
+
+
+            // Movement Update Loop runs every frame
+            scene.onBeforeRenderObservable.add(() => {
+                if (!block) return; // Safety check
+
+                // 1. TURNING/STEERING
+                if (keyStates.left) {
+                    block.position.x += lateralSpeed;
+                }
+                if (keyStates.right) {
+                    block.position.x -= lateralSpeed;
+                }
+
+                // 2. FORWARD MOVEMENT: Use translate to move along the mesh's local Z axis.
+                // This is the stable movement method.
+                block.translate(BABYLON.Axis.Z, blockSpeed, BABYLON.Space.LOCAL);
+            });
+
+            return scene;
+        };
+
+        const initFunction = async function () {
+            const canvas = document.getElementById("renderCanvas");
+            const engine = new BABYLON.Engine(canvas, true);
+            
+            const scene = createScene(canvas, engine); 
+
+            engine.runRenderLoop(function () {
+                scene.render();
+            });
+
+            window.addEventListener("resize", function () {
+                engine.resize();
+            });
+        };
+
+        window.onload = initFunction;
+    </script>
+</head>
+<body class="bg-gray-900 flex items-center justify-center">
+    <canvas id="renderCanvas"></canvas>
+</body>
+</html>

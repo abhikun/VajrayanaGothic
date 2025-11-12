@@ -69,15 +69,17 @@
       object-fit: cover;
     }
 	    /* --- NEW BLURB SECTION --- */
-    .blurb-section {
+.blurb-section {
       width: 100vw;
       min-height: 60vh;
       display: flex;
+      flex-direction: column; /* vertical layout */
       justify-content: center;
       align-items: center;
       padding: 8vw 4vw;
       box-sizing: border-box;
-      background: #2a3d42; /* darker continuation */
+      background: #2a3d42;
+      text-align: center;
     }
 
     .blurb-content {
@@ -87,8 +89,10 @@
       line-height: 1.6;
       text-align: left;
       color: #e6c9a4;
+      margin-bottom: 2rem; /* space between text and button */
     }
-	 /* --- BUTTON STYLE --- */
+
+    /* --- BUTTON STYLE --- */
     .blurb-button {
       background: none;
       color: #e5a054;
@@ -101,6 +105,7 @@
       transition: all 0.3s ease;
       text-transform: uppercase;
       border-radius: 2em;
+      align-self: center; /* ensures center placement */
     }
 
     .blurb-button:hover {
