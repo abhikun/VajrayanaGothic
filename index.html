@@ -68,6 +68,47 @@
       display: block;
       object-fit: cover;
     }
+	    /* --- NEW BLURB SECTION --- */
+    .blurb-section {
+      width: 100vw;
+      min-height: 60vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8vw 4vw;
+      box-sizing: border-box;
+      background: #2a3d42; /* darker continuation */
+    }
+
+    .blurb-content {
+      max-width: 800px;
+      width: 80vw;
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      line-height: 1.6;
+      text-align: left;
+      color: #e6c9a4;
+    }
+	 /* --- BUTTON STYLE --- */
+    .blurb-button {
+      background: none;
+      color: #e5a054;
+      border: 2px solid #e5a054;
+      padding: 0.8em 2em;
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      font-family: 'Futura', sans-serif;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      border-radius: 2em;
+    }
+
+    .blurb-button:hover {
+      background: #e5a054;
+      color: #2a3d42;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(229,160,84,0.3);
+    }
 
     @media (max-width: 420px) {
       .mural-text h1 {
@@ -87,7 +128,22 @@
   <div class="thangka-section">
     <img src="./images/bhavachakraBG.webp" alt="Landing Thangka" />
   </div>
-
+ <!-- New blurb below image -->
+  <div class="blurb-section">
+    <div class="blurb-content">
+      <p>
+        A multimedia web novel about driving through the Eastern Himalayas while your understanding of relationships, the self, and enlightenment unravels in real time.
+		A gonzo travelogue meets Buddhist metaphysics meets postcolonial anxiety meets extremely online psychoanalysis.
+      </p>
+      <p>
+        Fair warning: This narrator pathologizes everything, including his own pathologizing. He's unreliable in the most reliable way possible. The prose oscillates between ecstatic landscape description and merciless self-excavation. There are no clean resolutions, only increasingly ornate spirals of irony.
+      </p>
+	  <p>
+	  Welcome to Monyul. Welcome to the Bardo.
+	  </p>
+    </div>
+	<button class="blurb-button" onclick="window.location.href='about.html'">Enter the Archive</button>
+  </div>
   <script>
     const header = document.querySelector('.mural-text h1');
     const image = document.querySelector('.thangka-section img');
