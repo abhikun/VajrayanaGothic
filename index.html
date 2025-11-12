@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vajrayana Gothic-Home</title>
+  <style>
+    /* Place your custom font files in a folder named "fonts" next to this HTML file.
+       Replace "YourFont" with your actual font filename (without extension) as needed. */
+    @font-face {
+      font-family: 'Futura';
+      src: url('./fonts/futur.ttf') format('ttf'),
+           
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root{
+      --text-width: 70vw; /* text container will occupy 70% of the viewport width */
+      --max-width: 1200px; /* optional: limit how wide it gets on very large screens */
+      --page-padding: 4vw;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      padding:0;
+      font-family: 'Futura', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: #375860; /* subtle background; change as needed */
+      color: #e5a054;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Centering wrapper so the text block sits nicely on the page */
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: var(--page-padding);
+      box-sizing:border-box;
+    }
+
+    /* This is the text block that always occupies 70% of the screen width */
+    .mural-text{
+      width: var(--text-width);
+      max-width: var(--max-width);
+      background: rgba(255,255,255,0.0); /* transparent, but useful if you want a panel */
+      line-height:1.35;
+      font-size: clamp(1rem, 2.5vw, 2.25rem); /* responsive font sizing */
+      text-align: left;
+      box-sizing: border-box;
+      hyphens:auto;
+      word-break: break-word;
+    }
+.mural-text h1 {
+font-size: clamp(9rem, 6vw, 5rem); /* larger H1 */
+margin: 0 0 .4em 0;
+text-align: left;
+}
+    /* If you want the text to always be exactly 70% of *the screen width*,
+       using vw ensures that even if the parent has padding it still occupies 70vw.
+       If you'd rather use 70% relative to the parent container, change width to 70%. */
+
+    /* Accessibility: ensure good contrast when text is large */
+    @media (max-width:420px){
+      .mural-text{ font-size: clamp(0.9rem, 4.5vw, 1.4rem); }
+    }
+
+    /* Small utility to visually debug the container during development */
+    /* .mural-text { outline: 1px dashed rgba(0,0,0,0.08); } */
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="mural-text" role="article">
+      <!-- Replace this with the text you want to show. This container will always occupy ~70% of the viewport width. -->
+      <h1 style="margin:0 0 .25em 0;">VAJRAYANA GOTHIC</h1>
+      
+    </div>
+  </div>
+</body>
+</html>
