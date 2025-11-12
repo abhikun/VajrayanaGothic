@@ -154,15 +154,31 @@
 
             // Movement Update Loop runs every frame
             scene.onBeforeRenderObservable.add(() => {
-                if (!block) return; // Safety check
+               // 1. TURNING INPUT
+    let tilt = 0;
+    if (keyStates.left) {
+        block.position.x += lateralSpeed;
+        tilt = 0.2; // tilt left (negative roll)
+    }
+    if (keyStates.right) {
+        block.position.x -= lateralSpeed;
+        tilt = -0.2; // tilt right (positive roll)
+    }
 
-                // 1. TURNING/STEERING
-                if (keyStates.left) {
-                    block.position.x += lateralSpeed;
-                }
-                if (keyStates.right) {
-                    block.position.x -= lateralSpeed;
-                }
+    // 2. Smooth roll inertia
+    if (!block.rotationQuaternion) {
+        block.rotationQuaternion = BABYLON.Quaternion.Identity();
+    }
+
+    // current roll (around Z)
+    const currentEuler = block.rotationQuaternion.toEulerAngles();
+    const targetEuler = new BABYLON.Vector3(currentEuler.x, currentEuler.y, tilt);
+    
+    // interpolate roll toward target
+    const lerpFactor = 0.1; // smaller = smoother, more inertia
+    const newEuler = BABYLON.Vector3.Lerp(currentEuler, targetEuler, lerpFactor);
+    block.rotationQuaternion = BABYLON.Quaternion.FromEulerAngles(newEuler.x, newEuler.y, newEuler.z);
+
 
                 // 2. FORWARD MOVEMENT: Use translate to move along the mesh's local Z axis.
                 // This is the stable movement method.
