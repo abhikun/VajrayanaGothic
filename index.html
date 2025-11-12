@@ -3,86 +3,120 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vajrayana Gothic-Home</title>
+  <title>Vajrayana Gothic — Home</title>
+
   <style>
-    /* Place your custom font files in a folder named "fonts" next to this HTML file.
-       Replace "YourFont" with your actual font filename (without extension) as needed. */
     @font-face {
       font-family: 'Futura';
-      src: url('./fonts/futur.ttf') format('ttf'),
-           
+      src: url('./fonts/futur.ttf') format('truetype');
       font-weight: 100 900;
       font-style: normal;
       font-display: swap;
     }
 
-    :root{
-      --text-width: 70vw; /* text container will occupy 70% of the viewport width */
-      --max-width: 1200px; /* optional: limit how wide it gets on very large screens */
-      --page-padding: 4vw;
-    }
-
-    html,body{
-      height:100%;
-      margin:0;
-      padding:0;
-      font-family: 'Futura', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: #375860; /* subtle background; change as needed */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #375860;
       color: #e5a054;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+      font-family: 'Futura', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Centering wrapper so the text block sits nicely on the page */
-    .wrap{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: var(--page-padding);
-      box-sizing:border-box;
+    /* Sticky centered text */
+    .mural-text {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
     }
 
-    /* This is the text block that always occupies 70% of the screen width */
-    .mural-text{
-      width: var(--text-width);
-      max-width: var(--max-width);
-      background: rgba(255,255,255,0.0); /* transparent, but useful if you want a panel */
-      line-height:1.35;
-      font-size: clamp(1rem, 2.5vw, 2.25rem); /* responsive font sizing */
+    .mural-text h1 {
+      font-size: clamp(2rem, 12vw, 9rem);
+      width: 70vw;
+      line-height: 0.9;
+      margin: 0;
       text-align: left;
-      box-sizing: border-box;
-      hyphens:auto;
-      word-break: break-word;
-    }
-.mural-text h1 {
-font-size: clamp(2rem, 12vw, 9rem); /* larger H1 */
-margin: 0 0 .4em 0;
-text-align: left;
-  width: 70vw; /* occupies 70% of screen width visually */
-  line-height: 0.9; /* keeps large text tighter */
-  overflow-wrap: break-word;
-}
-    /* If you want the text to always be exactly 70% of *the screen width*,
-       using vw ensures that even if the parent has padding it still occupies 70vw.
-       If you'd rather use 70% relative to the parent container, change width to 70%. */
-
-    /* Accessibility: ensure good contrast when text is large */
-    @media (max-width:420px){
-      .mural-text{ font-size: clamp(0.9rem, 4.5vw, 1.4rem); }
+      transition: opacity 0.2s linear;
+      opacity: 1;
     }
 
-    /* Small utility to visually debug the container during development */
-    /* .mural-text { outline: 1px dashed rgba(0,0,0,0.08); } */
+    .wrap {
+      height: 100vh;
+    }
+
+    .thangka-section {
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .thangka-section img {
+      width: 100vw;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    @media (max-width: 420px) {
+      .mural-text h1 {
+        font-size: clamp(1.5rem, 14vw, 6rem);
+      }
+    }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="mural-text" role="article">
-      <!-- Replace this with the text you want to show. This container will always occupy ~70% of the viewport width. -->
-      <h1 style="margin:0 0 .25em 0;">VAJRAYANA GOTHIC</h1>
-      
-    </div>
+  <div class="mural-text" role="article">
+    <h1>VAJRAYANA GOTHIC</h1>
   </div>
+
+  <div class="wrap"></div>
+
+  <div class="thangka-section">
+    <img src="./images/bhavachakraBG.webp" alt="Landing Thangka" />
+  </div>
+
+  <script>
+    const header = document.querySelector('.mural-text h1');
+    const image = document.querySelector('.thangka-section img');
+
+    function fadeHeaderOnScroll() {
+      const rect = image.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+
+      // distance of image top from viewport top
+      const distance = rect.top;
+
+      // start fading when image is 70% viewport height away,
+      // fully invisible when image top reaches center
+      const fadeStart = viewportHeight * 0.7;
+      const fadeEnd = viewportHeight * 0.5;
+
+      if (distance > fadeStart) {
+        header.style.opacity = 1;
+      } else if (distance < fadeEnd) {
+        header.style.opacity = 0;
+      } else {
+        // interpolate opacity between start and end
+        const t = (distance - fadeEnd) / (fadeStart - fadeEnd);
+        header.style.opacity = t;
+      }
+    }
+
+    window.addEventListener('scroll', fadeHeaderOnScroll);
+    fadeHeaderOnScroll();
+  </script>
 </body>
 </html>
